@@ -8,7 +8,6 @@ import logging
 import os
 
 import torch
-from torch._six import string_classes
 from collections.abc import Mapping
 
 from fast_reid.fastreid.config import configurable
@@ -28,6 +27,7 @@ __all__ = [
 # _root = os.getenv("FASTREID_DATASETS", "datasets")
 _root = os.getenv("FASTREID_DATASETS", "fast_reid/datasets")
 
+string_classes = str
 
 def _train_loader_from_config(cfg, *, train_set=None, transforms=None, sampler=None, **kwargs):
 
