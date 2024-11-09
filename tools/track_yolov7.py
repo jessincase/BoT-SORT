@@ -176,9 +176,9 @@ def detect():
             save_path = str(save_dir / p.name)  # img.jpg
 
             # Stream results
-            if view_img:
-                cv2.imshow('BoT-SORT', im0)
-                cv2.waitKey(1)  # 1 millisecond
+            # if view_img:
+                # cv2.imshow('BoT-SORT', im0)
+                # cv2.waitKey(1)  # 1 millisecond
 
             # Save results (image with detections)
             if save_img:
