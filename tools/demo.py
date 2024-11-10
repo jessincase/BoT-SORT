@@ -302,6 +302,8 @@ def main(exp, args):
 
     if args.trt:
         args.device = "gpu"
+
+    print(f"Using {args.device}")
     args.device = torch.device("cuda" if args.device == "gpu" else "cpu")
 
     logger.info("Args: {}".format(args))
