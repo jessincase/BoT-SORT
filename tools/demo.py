@@ -93,7 +93,7 @@ class Predictor(object):
         exp,
         trt_file=None,
         decoder=None,
-        device=torch.device("gpu"),
+        device=torch.device("cuda"),
         fp16=False
     ):
         self.model = model
