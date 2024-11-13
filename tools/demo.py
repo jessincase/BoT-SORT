@@ -93,7 +93,7 @@ class Predictor(object):
         exp,
         trt_file=None,
         decoder=None,
-        device=torch.device("cpu"),
+        device=torch.device("gpu"),
         fp16=False
     ):
         self.model = model
@@ -355,6 +355,7 @@ def main(exp, args):
     if args.demo == "image" or args.demo == "images":
         image_demo(predictor, vis_folder, current_time, args)
     elif args.demo == "video" or args.demo == "webcam":
+        print(predictor.device)
         imageflow_demo(predictor, vis_folder, current_time, args)
     else:
         raise ValueError("Error: Unknown source: " + args.demo)
