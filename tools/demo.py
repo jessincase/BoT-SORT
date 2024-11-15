@@ -20,6 +20,8 @@ from tracker.tracking_utils.timer import Timer
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 
+unique_person_ids = set()
+person_count = 0
 
 def make_parser():
     parser = argparse.ArgumentParser("BoT-SORT Demo!")
@@ -216,6 +218,7 @@ def image_demo(predictor, vis_folder, current_time, args):
 
 
 def imageflow_demo(predictor, vis_folder, current_time, args):
+    global person_count
     cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
@@ -258,6 +261,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                 for t in online_targets:
                     tlwh = t.tlwh
                     tid = t.track_id
+                    if tid not in unique_person_ids:
+                        unique_person_ids.add(tid)
+                        person_count += 1
+
                     vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
                     if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
                         online_tlwhs.append(tlwh)
@@ -275,9 +282,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                 online_im = img_info['raw_img']
             if args.save_result:
                 vid_writer.write(online_im)
-            # ch = cv2.waitKey(1)
-            # if ch == 27 or ch == ord("q") or ch == ord("Q"):
-            #     break
+
         else:
             break
         frame_id += 1
@@ -288,6 +293,9 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             f.writelines(results)
         logger.info(f"save results to {res_file}")
 
+        with open(res_file, 'w+') as f:
+            f.write(f"amount of people in video: {person_count} \n")
+        print(person_count)
 
 def main(exp, args):
     if not args.experiment_name:
@@ -355,7 +363,12 @@ def main(exp, args):
     if args.demo == "image" or args.demo == "images":
         image_demo(predictor, vis_folder, current_time, args)
     elif args.demo == "video" or args.demo == "webcam":
-        print(predictor.device)
+        print(f"Using device: {predictor.device}")
+        if predictor.device == 'cuda':
+            print(torch.cuda.get_device_name(0))
+            print('Memory Usage:')
+            print('Allocated:', round(torch.cuda.memory_allocated(0)/1024**3,1), 'GB')
+            print('Cached:   ', round(torch.cuda.memory_reserved(0)/1024**3,1), 'GB')
         imageflow_demo(predictor, vis_folder, current_time, args)
     else:
         raise ValueError("Error: Unknown source: " + args.demo)
